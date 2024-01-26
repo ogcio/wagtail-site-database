@@ -53,7 +53,6 @@ resource "aws_db_parameter_group" "default" {
 
 resource "aws_db_instance" "default" {
   allocated_storage           = var.db_allocated_storage
-  allow_major_version_upgrade = false
   apply_immediately           = true
   auto_minor_version_upgrade  = false
   backup_retention_period     = var.backup_retention_period
