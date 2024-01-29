@@ -119,7 +119,7 @@ resource "aws_db_instance" "default" {
 
 resource "aws_db_snapshot" "default" {
   count = var.create_snapshot ? 1 : 0
-  db_instance_identifier = aws_db_instance.default
+  db_instance_identifier = aws_db_instance.default.name
   db_snapshot_identifier = "${var.name}-snapshot"
 }
 
