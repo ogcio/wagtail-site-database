@@ -20,7 +20,7 @@ resource "aws_db_subnet_group" "default" {
 
 resource "aws_db_parameter_group" "default" {
   name   = "${var.name}-parameter-group"
-  family = "postgres12"
+  family = "postgres15"
 
   parameter {
     name  = "lc_messages"
