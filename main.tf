@@ -66,7 +66,7 @@ resource "aws_db_instance" "default" {
   monitoring_interval         = "0"
   multi_az                    = true
   db_name                     = var.db_name
-  parameter_group_name        = aws_db_parameter_group.default2.id
+  parameter_group_name        = aws_db_parameter_group.default.id
   password                    = var.db_password
   publicly_accessible         = var.publicly_accessible
   skip_final_snapshot         = true
