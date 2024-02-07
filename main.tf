@@ -18,6 +18,37 @@ resource "aws_db_subnet_group" "default" {
   subnet_ids    = var.subnets
 }
 
+resource "aws_db_parameter_group" "default2" {
+  name   = "${var.name}-parameter-group"
+  family = "postgres15"
+
+  parameter {
+    name  = "lc_messages"
+    value = "en_IE.UTF-8"
+  }
+
+  parameter {
+    name  = "lc_monetary"
+    value = "en_IE.UTF-8"
+  }
+
+  parameter {
+    name  = "lc_numeric"
+    value = "en_IE.UTF-8"
+  }
+
+  parameter {
+    name  = "lc_time"
+    value = "en_IE.UTF-8"
+  }
+
+  parameter {
+    apply_method = "pending-reboot"
+    name         = "shared_buffers"
+    value        = "{DBInstanceClassMemory/32768}"
+  }
+}
+
 resource "aws_db_parameter_group" "default" {
   name   = "${var.name}-parameter-group"
   family = "postgres15"
@@ -66,7 +97,7 @@ resource "aws_db_instance" "default" {
   monitoring_interval         = "0"
   multi_az                    = true
   db_name                     = var.db_name
-  parameter_group_name        = aws_db_parameter_group.default.id
+  parameter_group_name        = aws_db_parameter_group.default2.id
   password                    = var.db_password
   publicly_accessible         = var.publicly_accessible
   skip_final_snapshot         = true
