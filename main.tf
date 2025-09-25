@@ -12,6 +12,11 @@ variable "subnets"                      {  }
 variable "security_group_ids"           {  }
 variable "create_snapshot"              { default =  true }
 
+variable "create_predeploy_snapshot" {
+  description = "Create a pre-deployment snapshot before applying risky changes"
+  type        = bool
+  default     = true
+}
 
 resource "aws_db_subnet_group" "default" {
   name          = "${var.name}-db-subnet-group"
@@ -69,7 +74,7 @@ resource "aws_db_instance" "default" {
   parameter_group_name        = aws_db_parameter_group.default.id
   password                    = var.db_password
   publicly_accessible         = var.publicly_accessible
-  skip_final_snapshot         = true
+  skip_final_snapshot         = false
   storage_type                = "gp2"
   username                    = var.db_username
   vpc_security_group_ids      = var.security_group_ids
@@ -83,10 +88,10 @@ resource "aws_db_instance" "default" {
 }
 
 
-resource "aws_db_snapshot" "default" {
-  count = var.create_snapshot ? 1 : 0
+resource "aws_db_snapshot" "pre_deployment" {
+  count                  = var.create_predeploy_snapshot ? 1 : 0
   db_instance_identifier = aws_db_instance.default.identifier
-  db_snapshot_identifier = "${var.name}-snapshot"
+  db_snapshot_identifier = "${var.name}-pre-deploy-snapshot"
 }
 
 
