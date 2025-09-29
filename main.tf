@@ -94,6 +94,60 @@ resource "aws_db_snapshot" "pre_deployment" {
   db_snapshot_identifier = "${var.name}-pre-deploy-snapshot"
 }
 
+resource "aws_backup_vault" "rds_vault" {
+  name = "${var.name}-backup-vault"
+}
+
+resource "aws_backup_plan" "rds_plan" {
+  name = "${var.name}-rds-backup-plan"
+
+  rule {
+    rule_name         = "weekly-backup"
+    target_vault_name = aws_backup_vault.rds_vault.name
+    schedule          = "cron(0 3 ? * SUN *)"
+    lifecycle { delete_after = 90 }
+  }
+
+  rule {
+    rule_name         = "monthly-backup"
+    target_vault_name = aws_backup_vault.rds_vault.name
+    schedule          = "cron(0 3 1 * ? *)"
+    lifecycle { delete_after = 365 }
+  }
+}
+
+resource "aws_backup_selection" "rds_selection" {
+  iam_role_arn = aws_iam_role.backup_role.arn
+  name         = "${var.name}-rds-selection"
+  plan_id      = aws_backup_plan.rds_plan.id
+
+  resources = [
+    aws_db_instance.default.arn
+  ]
+}
+
+resource "aws_iam_role" "backup_role" {
+  name = "${var.name}-rds-backup-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "backup.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "backup_role_attach" {
+  role       = aws_iam_role.backup_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+}
+
 
 output "address"      { value = aws_db_instance.default.address }
 output "arn"          { value = aws_db_instance.default.arn }
