@@ -104,14 +104,14 @@ resource "aws_backup_plan" "rds_plan" {
   rule {
     rule_name         = "weekly-backup"
     target_vault_name = aws_backup_vault.rds_vault.name
-    schedule          = "cron(0 3 ? * SUN *)"
+    schedule          = "cron(0 6 ? * SUN *)"
     lifecycle { delete_after = 90 }
   }
 
   rule {
     rule_name         = "monthly-backup"
     target_vault_name = aws_backup_vault.rds_vault.name
-    schedule          = "cron(0 3 1 * ? *)"
+    schedule          = "cron(0 6 1 * ? *)"
     lifecycle { delete_after = 365 }
   }
 }
